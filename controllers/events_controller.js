@@ -9,7 +9,7 @@ events.get('/', async (req, res) => {
     try {
         const foundEvents = await Event.findAll({
             where: {
-                name: { [Op.like ]: `%${req.query.name? req.query.name: ''}%`}
+                name: { [Op.like ]: `%${req.query.name ? req.query.name: ''}%`}
             }
         })
         res.status(200).json(foundEvents)
