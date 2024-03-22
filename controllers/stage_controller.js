@@ -2,21 +2,19 @@
 const { Op } = require('sequelize')
 const stages = require('express').Router()
 const db = require('../models')
-const Stage = db
+const { Stage } = db
 
 //INDEX
 stages.get('/', async (req, res) => {
     try {
         const foundStages = await Stage.findAll({
             where: {
-                name: { [Op.like]: `%${req.query.name ? req.query.name : ''}%`}
+                stage_name: { [Op.like]: `%${req.query.name ? req.query.name : ''}%`}
             }
         })
-        console.log("Found Stages:", foundStages)
         res.status(200).json(foundStages)
     } catch (error) {
-        console.error("Error in retrieving stages:", error.message || error)
-        res.status(500).json({ error: "Internal server error" })
+        res.status(500).json(error)
     }
 })
 
@@ -46,10 +44,35 @@ stages.post('/', async (req, res) => {
 })
 
 //UPDATE
-// stages.put('/', async (req.res) => {
-//     try {
+stages.put('/:id', async (req, res) => {
+    try{
+        const updatedStage = await Stage.update(req.body, {
+            where: {
+                stage_id: req.params.id
+            }
+        })
+        res.status(200).json({
+            message: `Successfully updated ${updatedStage} stage(s)`
+        })
+    } catch (error) {
+        res.status(500).json(error)
+    }
+})
 
-//     }
-// })
+//DELETE
+stages.delete('/:id', async (req, res) => {
+    try{
+        const deletedStage = await Stage.destroy({
+            where: {
+                stage_id: req.params.id
+            }
+        })
+        res.status(200).json({
+            message: `Successfully deleted ${deletedStage} stage(s)`
+        })
+    } catch (error) {
+        res.status(500).json(error)
+    }
+})
 
 module.exports = stages
