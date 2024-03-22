@@ -1,4 +1,5 @@
 //DEPENDENCIES
+const { Op } = require('sequelize')
 const events = require('express').Router()
 const db = require('../models')
 const { Event } = db
@@ -6,7 +7,11 @@ const { Event } = db
 //Index
 events.get('/', async (req, res) => {
     try {
-        const foundEvents = await Event.findAll()
+        const foundEvents = await Event.findAll({
+            where: {
+                name: { [Op.like ]: `%${req.query.name? req.query.name: ''}%`}
+            }
+        })
         res.status(200).json(foundEvents)
     } catch(error) {
         res.status(500).json(error)
