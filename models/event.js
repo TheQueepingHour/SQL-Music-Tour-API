@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         as: "stages",
         through: StageEvents
       })
+
+      Event.hasMany(MeetGreets, {
+        foreignKey: "event_id",
+        as: "meet_greets"
+      })
     }
   }
   Event.init({
