@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       })
     }
   }
-  set_time.init({
+  SetTime.init({
     set_time_id: {
       type: DataTypes.INTEGER,
       primaryKey: true
