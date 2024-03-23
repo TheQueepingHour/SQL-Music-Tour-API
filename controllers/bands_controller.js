@@ -11,7 +11,8 @@ bands.get('/', async (req, res) => {
             order: [['available_start_time', 'ASC']],
             where: {
                 name: { [Op.like]: `%${req.query.name ? req.query.name : ''}%`}
-            }
+            },
+            limit: req.query.limit ? parseInt(req.query.limit) : null
         })
         res.status(200).json(foundBands)
     } catch(error) {

@@ -10,7 +10,8 @@ events.get('/', async (req, res) => {
         const foundEvents = await Event.findAll({
             where: {
                 name: { [Op.like ]: `%${req.query.name ? req.query.name: ''}%`}
-            }
+            },
+            limit: req.query.limit ? parseInt(req.query.limit) : null
         })
         res.status(200).json(foundEvents)
     } catch(error) {
