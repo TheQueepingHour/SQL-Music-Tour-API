@@ -2,7 +2,7 @@
 const { Op } = require('sequelize')
 const bands = require('express').Router()
 const db = require('../models')
-const { Band, MeetGreets } = db
+const { Band, MeetGreets, Event, SetTime } = db
 
 //INDEX
 bands.get('/', async (req, res) => {
@@ -25,10 +25,38 @@ bands.get('/:name', async (req, res) => {
     try {
         const foundBand = await Band.findOne({
             where: { name: req.params.name },
-            include: {
-                model: MeetGreets,
-                as: "meet_greets"
-            }
+            include: [
+                {
+                    model: SetTime,
+                    as: "set_time",
+                    include: {
+                        model: Event,
+                        as: "event",
+                        where: {
+                            name: {[Op.iLike]: `%${req.query.event ? req.query.event : ''}%`}
+                        },
+                        attributes: {exclude: ['event_id']}
+                    },
+                    attributes: {exclude: ['band_id']}
+                },
+                {
+                    model: MeetGreets,
+                    as: "meet_greets",
+                    include: {
+                        model: Event,
+                        as: "event",
+                        where: {
+                            name: {[Op.iLike]: `%${req.query.event ? req.query.event : ''}%`}
+                        },
+                        attributes: {exclude: ['event_id']}
+                    },
+                    attributes: {exclude: ['band_id', 'event_id']}
+                }
+            ],
+            order: [
+                [{model: MeetGreets, as: 'meet_greets'}, {model: Event, as: 'event'}, 'date', 'ASC'],
+                [{model: SetTime, as: 'set_time'}, {model: Event, as: 'event'}, 'date', 'ASC']
+            ]
         })
         res.status(200).json(foundBand)
     } catch(error) {
