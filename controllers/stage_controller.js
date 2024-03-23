@@ -11,7 +11,7 @@ stages.get('/', async (req, res) => {
             where: {
                 stage_name: { [Op.iLike]: `%${req.query.stage_name ? req.query.stage_name : ''}%`}
             },
-            limit: req.query.limit ? parseInt(req.query.limit) : null
+            limit: req.query.limit ? parseInt(req.query.limit) : 10 //Default limit for responses
         })
         res.status(200).json(foundStages)
     } catch (error) {
