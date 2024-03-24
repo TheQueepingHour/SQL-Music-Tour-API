@@ -2,7 +2,7 @@
 const { Op } = require('sequelize')
 const events = require('express').Router()
 const db = require('../models')
-const { Event } = db
+const { Event, Stage, SetTime, MeetGreets } = db
 
 //Index
 events.get('/', async (req, res) => {
@@ -20,10 +20,42 @@ events.get('/', async (req, res) => {
 })
 
 //Show
-events.get('/:id', async (req, res) => {
+events.get('/:name', async (req, res) => {
     try {
         const foundEvent = await Event.findOne({
-            where: { event_id: req.params.id }
+            where: { name: req.params.name },
+            include: [
+                {
+                    model: Stage,
+                    as: "stages",
+                    include: [
+                        {
+                            model: SetTime,
+                            as: 'set_time',
+                            include: {
+                                model: Event,
+                                as: 'event',
+                                attributes: {exclude: ['event_id']}
+                            },
+                            attributes: {exclude: ['stage_id']}
+                        }
+                    ]
+                },
+                {
+                    model: MeetGreets,
+                    as: "meet_greets",
+                    include: {
+                        model: Event,
+                        as: 'event',
+                        attributes: {exclude: ['event_id']}
+                    },
+                    attributes: {exclude: ['event_id', 'band_id']}
+                }
+            ],
+            order: [
+                [{model: Stage, as: 'stages'}, {model: SetTime, as: 'set_time'}, {model: Event, as: 'event'}, 'date', 'ASC'],
+                [{model: MeetGreets, as: 'meet_greets'}, {model: Event, as: 'event'}, 'date', 'ASC']
+            ]
         })
         res.status(200).json(foundEvent)
     } catch (error) {
